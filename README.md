@@ -172,11 +172,3 @@ npm run dev
 - 验证最小图执行链路
 - 验证动态端口类型与适配器设计
 
-
-## 设计文档
-
-- [reflection-runtime-architecture/design.md](/home/xiayh/Projects/gkdviz/doc/reflection-runtime-architecture/design.md)
-- [reflection-runtime-architecture/goal.md](/home/xiayh/Projects/gkdviz/doc/reflection-runtime-architecture/goal.md)
-- [reflection-runtime-architecture/plan.md](/home/xiayh/Projects/gkdviz/doc/reflection-runtime-architecture/plan.md)
-- [reflection-runtime-architecture/log.md](/home/xiayh/Projects/gkdviz/doc/reflection-runtime-architecture/log.md)
-- [todo.md](/home/xiayh/Projects/gkdviz/todo.md)
