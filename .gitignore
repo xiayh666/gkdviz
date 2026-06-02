@@ -1,0 +1,21 @@
+# Xmake cache
+.xmake/
+build/
+
+.clangd
+.codex/
+.agents/
+doc/
+prototype/
+
+apps/gkdviz-ui/node_modules/
+apps/gkdviz-ui/dist/
+
+compile_commands.json
+project.md
+todo.md
+
+# MacOS Cache
+.DS_Store
+
+
