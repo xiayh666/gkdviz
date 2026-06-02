@@ -1,0 +1,117 @@
+import type { ThemeConfig } from '../types/ui'
+
+export const themeConfig: ThemeConfig = {
+  mode: 'latte',
+  glass: true
+}
+
+export const latteTokens = {
+  rosewater: '#dc8a78',
+  flamingo: '#dd7878',
+  pink: '#ea76cb',
+  mauve: '#8839ef',
+  red: '#d20f39',
+  maroon: '#e64553',
+  peach: '#fe640b',
+  yellow: '#df8e1d',
+  green: '#40a02b',
+  teal: '#179299',
+  sky: '#04a5e5',
+  sapphire: '#209fb5',
+  blue: '#1e66f5',
+  lavender: '#7287fd',
+  text: '#4c4f69',
+  subtext0: '#6c6f85',
+  surface1: '#bcc0cc',
+  base: '#eff1f5',
+  mantle: '#e6e9ef',
+  crust: '#dce0e8'
+}
+
+export const vscodeThemeVars: Record<string, string> = {
+  '--vscode-font-family': '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif',
+  '--vscode-foreground': latteTokens.text,
+  '--vscode-focusBorder': latteTokens.lavender,
+
+  '--vscode-button-background': latteTokens.mauve,
+  '--vscode-button-foreground': '#ffffff',
+  '--vscode-button-hoverBackground': latteTokens.lavender,
+
+  '--vscode-input-background': '#ffffff',
+  '--vscode-input-foreground': latteTokens.text,
+  '--vscode-input-border': latteTokens.surface1,
+  '--vscode-input-placeholderForeground': latteTokens.subtext0,
+
+  '--vscode-dropdown-background': '#ffffff',
+  '--vscode-dropdown-foreground': latteTokens.text,
+  '--vscode-dropdown-border': latteTokens.surface1,
+  '--vscode-settings-dropdownBackground': '#ffffff',
+  '--vscode-settings-dropdownForeground': latteTokens.text,
+  '--vscode-settings-dropdownBorder': latteTokens.surface1,
+  '--vscode-settings-dropdownListBorder': latteTokens.surface1,
+  '--vscode-menu-background': '#ffffff',
+  '--vscode-menu-foreground': latteTokens.text,
+  '--vscode-menu-border': latteTokens.surface1,
+  '--vscode-list-background': '#ffffff',
+  '--vscode-list-focusBackground': latteTokens.crust,
+  '--vscode-list-focusForeground': latteTokens.text,
+  '--vscode-list-inactiveSelectionBackground': latteTokens.mantle,
+  '--vscode-list-inactiveSelectionForeground': latteTokens.text,
+  '--vscode-list-dropBackground': latteTokens.mantle,
+  '--vscode-editorWidget-background': '#ffffff',
+  '--vscode-editorWidget-border': latteTokens.surface1,
+  '--vscode-list-activeSelectionBackground': latteTokens.crust,
+  '--vscode-list-activeSelectionForeground': latteTokens.text,
+  '--vscode-list-hoverBackground': latteTokens.mantle,
+  '--vscode-list-hoverForeground': latteTokens.text,
+
+  /* FAST/webview-ui-toolkit internal design tokens (config-driven, no CSS forcing). */
+  '--dropdown-background': '#ffffff',
+  '--dropdown-foreground': latteTokens.text,
+  '--dropdown-border': latteTokens.surface1,
+  '--list-active-selection-background': latteTokens.crust,
+  '--list-active-selection-foreground': latteTokens.text,
+  '--list-hover-background': latteTokens.mantle,
+  '--focus-border': latteTokens.lavender
+}
+
+export const uiStyleVars: Record<string, string> = {
+  '--ui-font-size': '13px',
+  '--ui-title-height': '36px',
+  '--ui-status-height': '36px',
+  '--ui-panel-height': '200px',
+  '--ui-activity-width': '48px',
+  '--ui-sidebar-width': '280px',
+  '--ui-inspector-width': '320px',
+  '--ui-gap-xs': '4px',
+  '--ui-gap-sm': '6px',
+  '--ui-gap-md': '8px',
+  '--ui-gap-lg': '10px',
+  '--ui-pad-xs': '4px',
+  '--ui-pad-sm': '8px',
+  '--ui-pad-md': '10px',
+  '--ui-pad-lg': '12px',
+  '--ui-radius-sm': '4px',
+  '--ui-radius-md': '8px',
+  '--ui-radius-lg': '10px',
+  '--ui-radius-pill': '999px',
+  '--ui-border-width': '1px',
+  '--ui-blur': '10px',
+  '--ui-shadow-node': '0 8px 18px rgba(76,79,105,0.14)',
+  '--ui-shadow-focus': '0 0 0 2px color-mix(in srgb, var(--ctp-lavender) 35%, transparent)',
+  '--ui-transition-fast': '120ms ease-out',
+  '--ui-hover-bg': 'rgba(255, 255, 255, 0.45)',
+  '--ui-hover-bg-strong': 'rgba(255, 255, 255, 0.68)',
+  '--ui-active-bg': 'rgba(255, 255, 255, 0.58)',
+  '--ui-selected-bg': 'rgba(255, 255, 255, 0.62)',
+  '--ui-focus-border-color': 'var(--ctp-lavender)',
+  '--ui-focus-text-color': 'var(--ctp-mauve)',
+  '--ui-glass-bg': 'color-mix(in srgb, var(--ctp-base) 38%, transparent)',
+  '--ui-glass-bg-strong': 'color-mix(in srgb, var(--ctp-base) 52%, transparent)',
+  '--ui-glass-border': 'color-mix(in srgb, var(--ctp-surface1) 72%, white 28%)',
+  '--ui-glass-edge-soft': 'color-mix(in srgb, var(--ctp-surface1) 46%, transparent)',
+  '--ui-glass-shadow': '0 2px 8px rgba(76,79,105,0.08)',
+  '--ui-glass-shadow-outer': '0 0 0 1px color-mix(in srgb, white 22%, transparent), 0 4px 12px rgba(76,79,105,0.10)',
+  '--ui-glass-highlight': 'inset 0 1px 0 rgba(255, 255, 255, 0.48)',
+  '--ui-glass-saturate': '120%'
+}
