@@ -2,6 +2,7 @@
 #include "../../../core/graph/graph_compiler.hpp"
 #include "../../../core/reflection/node_schema_generator.hpp"
 #include "../../../core/reflection/static_reflection_provider.hpp"
+#include "../src/node_catalog_http.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -10,7 +11,7 @@
 
 namespace {
 
-struct Pid {
+struct SmokePid {
   struct Config {
     [[= gkdviz::core::SemanticAnnotation{gkdviz::core::Semantic::kGain}]]
     double kp{1.0};
@@ -45,7 +46,7 @@ struct Pid {
     double error{0.0};
   };
 
-  explicit Pid(const Config& cfg) : cfg_(cfg) {}
+  explicit SmokePid(const Config& cfg) : cfg_(cfg) {}
 
   Output process(const Input& in) {
     Output out{};
@@ -67,23 +68,96 @@ bool approx(double a, double b, double eps = 1e-9) {
   return std::fabs(a - b) < eps;
 }
 
+bool run_once_smoke() {
+  gkdviz::core::GraphCompiler::Catalog catalog;
+  catalog.emplace(
+      "NumberInput",
+      gkdviz::core::NodeSchema{
+          .type = "NumberInput",
+          .display_name = "Number Input",
+          .category = "Input",
+          .config_fields =
+              {
+                  gkdviz::core::FieldSchema{
+                      .name = "value",
+                      .type = {.value_type = gkdviz::core::ValueType::kFloat64},
+                      .default_value = 0.0,
+                  },
+              },
+          .output_ports =
+              {
+                  gkdviz::core::PortSchema{
+                      .name = "out",
+                      .type =
+                          {
+                              .value_type = gkdviz::core::ValueType::kFloat64,
+                              .semantic = gkdviz::core::Semantic::kNone,
+                              .unit = gkdviz::core::Unit::kNone,
+                          },
+                  },
+              },
+      });
+  catalog.emplace(
+      "DoublePrinter",
+      gkdviz::core::NodeSchema{
+          .type = "DoublePrinter",
+          .display_name = "Double Printer",
+          .category = "Test",
+          .input_ports =
+              {
+                  gkdviz::core::PortSchema{
+                      .name = "in",
+                      .type =
+                          {
+                              .value_type = gkdviz::core::ValueType::kFloat64,
+                              .semantic = gkdviz::core::Semantic::kNone,
+                              .unit = gkdviz::core::Unit::kNone,
+                          },
+                  },
+              },
+      });
+
+  gkdviz::core::GraphConfig graph{
+      .nodes =
+          {
+              {
+                  .id = "n1",
+                  .type = "NumberInput",
+                  .config = {{"value", 3.5}},
+              },
+              {.id = "p1", .type = "DoublePrinter"},
+          },
+      .edges =
+          {
+              {.from = "n1.out", .to = "p1.in"},
+          },
+  };
+
+  const auto result = gkdviz::backend::execute_graph_once(graph, catalog);
+  if (!result.ok || result.logs.size() != 1) {
+    return false;
+  }
+  return result.logs[0].find("input=3.5") != std::string::npos &&
+         result.logs[0].find("doubled=7") != std::string::npos;
+}
+
 } // namespace
 
 template <>
-struct gkdviz::core::AlgorithmReflectionTraits<Pid> {
+struct gkdviz::core::AlgorithmReflectionTraits<SmokePid> {
   static constexpr std::string_view display_name = "PID Controller";
   static constexpr std::string_view category = "Control";
 };
 
 int main() {
   gkdviz::core::StaticReflectionProvider provider;
-  provider.register_algorithm<Pid>();
+  provider.register_algorithm<SmokePid>();
 
   gkdviz::core::NodeSchemaGenerator generator(provider);
 
-  const auto schema = generator.generate<Pid>();
+  const auto schema = generator.generate<SmokePid>();
 
-  if (schema.type != "Pid") {
+  if (schema.type != "SmokePid") {
     std::cerr << "identify failed: type mismatch\n";
     return 1;
   }
@@ -166,7 +240,7 @@ int main() {
               {.id = "target1", .type = "VelocitySource"},
               {.id = "actual1", .type = "VelocitySource"},
               {.id = "dt1", .type = "TimeSource"},
-              {.id = "pid1", .type = "Pid"},
+              {.id = "pid1", .type = "SmokePid"},
               {.id = "sink1", .type = "CommandSink"},
           },
       .edges =
@@ -189,13 +263,19 @@ int main() {
     return 1;
   }
 
-  Pid pid(Pid::Config{});
-  const auto out = pid.process(Pid::Input{.target = 300.0, .actual = 280.0, .dt = 0.01});
+  SmokePid pid(SmokePid::Config{});
+  const auto out = pid.process(SmokePid::Input{.target = 300.0, .actual = 280.0, .dt = 0.01});
   if (!approx(out.error, 20.0)) {
     std::cerr << "pid process failed: error mismatch\n";
     return 1;
   }
 
+  if (!run_once_smoke()) {
+    std::cerr << "graph run smoke failed: NumberInput -> DoublePrinter\n";
+    return 1;
+  }
+
   std::cout << "pid reflected node smoke: PASS\n";
+  std::cout << "graph run smoke: PASS\n";
   return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../core/graph/graph_compiler.hpp"
+#include "../../../core/integration/control_lib_adapter.hpp"
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
@@ -13,6 +14,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <deque>
 #include <iostream>
 #include <optional>
 #include <sstream>
@@ -520,6 +522,27 @@ inline GraphRunResult execute_graph_once(const gkdviz::core::GraphConfig& graph,
       } else {
         result.errors.push_back({"DoublePrinter requires float64 input on " + node.id + ".in"});
       }
+      continue;
+    }
+    if (node.type == "ControlLibPid") {
+      auto setpoint = read_input(node.id, "setpoint");
+      auto feedback = read_input(node.id, "feedback");
+      const auto* setpoint_value = std::get_if<double>(&setpoint);
+      const auto* feedback_value = std::get_if<double>(&feedback);
+      if (setpoint_value == nullptr || feedback_value == nullptr) {
+        result.errors.push_back({"ControlLibPid requires float64 setpoint and feedback inputs on " + node.id});
+        continue;
+      }
+      const gkdviz::core::ControlLibPidConfig config{
+          .kp = read_config_f64(node, "kp").value_or(1.0),
+          .ki = read_config_f64(node, "ki").value_or(0.0),
+          .kd = read_config_f64(node, "kd").value_or(0.0),
+          .max_out = read_config_f64(node, "max_out").value_or(100.0),
+          .max_iout = read_config_f64(node, "max_iout").value_or(100.0),
+      };
+      gkdviz::core::ControlLibPidAdapter adapter(config);
+      const auto out = adapter.process(*setpoint_value, *feedback_value);
+      outputs[node.id + ".out"] = out;
       continue;
     }
 

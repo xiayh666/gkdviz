@@ -19,7 +19,7 @@ import {
   type NodeMouseHandler,
   type NodeProps
 } from '@xyflow/react'
-import { Button } from 'antd'
+import { Button, Input, Select } from 'antd'
 import type { EditorCanvasNodeData, PrototypeScene } from '../types/ui'
 import { getAdapterFieldOptions } from '../utils/adapterOptions'
 import {
@@ -137,33 +137,30 @@ function BackendNode({ id, data, selected }: NodeProps<EditorCanvasNodeData>) {
             <div className="comfy-node-field" key={field.name}>
               <label className="node-inline-label">{field.name}</label>
               {field.value_type === 'bool' ? (
-                <select
-                  className="node-inline-input"
+                <Select
+                  className="node-inline-input nodrag nowheel"
                   value={String(data.configValues[field.name] ?? false)}
+                  options={[
+                    { value: 'true', label: 'true' },
+                    { value: 'false', label: 'false' }
+                  ]}
                   onMouseDown={(event) => event.stopPropagation()}
                   onClick={(event) => event.stopPropagation()}
-                  onChange={(event) => handleFieldChange(field.name, event.target.value)}
-                >
-                  <option value="true">true</option>
-                  <option value="false">false</option>
-                </select>
+                  onChange={(value) => handleFieldChange(field.name, value)}
+                />
               ) : getAdapterFieldOptions(field.name) ? (
-                <select
-                  className="node-inline-input"
+                <Select
+                  className="node-inline-input nodrag nowheel"
                   value={String(data.configValues[field.name] ?? field.default ?? '')}
+                  options={getAdapterFieldOptions(field.name) ?? []}
                   onMouseDown={(event) => event.stopPropagation()}
                   onClick={(event) => event.stopPropagation()}
-                  onChange={(event) => handleFieldChange(field.name, event.target.value)}
-                >
-                  {getAdapterFieldOptions(field.name)?.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => handleFieldChange(field.name, value)}
+                />
               ) : (
-                <input
-                  className="node-inline-input"
+                <Input
+                  className="node-inline-input nodrag nowheel"
+                  inputMode={field.value_type.startsWith('int') || field.value_type.startsWith('float') ? 'decimal' : 'text'}
                   value={String(data.configValues[field.name] ?? '')}
                   onMouseDown={(event) => event.stopPropagation()}
                   onClick={(event) => event.stopPropagation()}
@@ -362,9 +359,9 @@ export function NodeCanvas({
           style={{ left: contextMenu.x, top: contextMenu.y }}
           onClick={(event) => event.stopPropagation()}
         >
-          <button
+          <Button
             className="node-context-item danger"
-            type="button"
+            type="text"
             onClick={() => {
               onDeleteNode(contextMenu.nodeId)
               closeContextMenu()
@@ -372,7 +369,7 @@ export function NodeCanvas({
           >
             <span className="codicon codicon-trash" />
             <span>删除节点</span>
-          </button>
+          </Button>
         </div>
       ) : null}
     </section>

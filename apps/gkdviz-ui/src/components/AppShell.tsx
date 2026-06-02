@@ -54,11 +54,22 @@ function coerceFieldValue(field: BackendConfigField, raw: string) {
   if (field.value_type === 'bool') {
     return raw === 'true'
   }
-  if (field.value_type.startsWith('int') || field.value_type.startsWith('float')) {
-    const value = Number(raw)
-    return Number.isFinite(value) ? value : field.default ?? 0
-  }
   return raw
+}
+
+function normalizeConfigValue(field: BackendConfigField, value: boolean | number | string | null) {
+  if (field.value_type === 'bool') {
+    return value === true || value === 'true'
+  }
+  if (field.value_type.startsWith('int')) {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? Math.trunc(parsed) : field.default ?? 0
+  }
+  if (field.value_type.startsWith('float')) {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : field.default ?? 0
+  }
+  return value ?? ''
 }
 
 function buildCompilePayload(nodes: Node<EditorCanvasNodeData>[], edges: Edge[]): GraphCompilePayload {
@@ -66,7 +77,12 @@ function buildCompilePayload(nodes: Node<EditorCanvasNodeData>[], edges: Edge[])
     nodes: nodes.map((node) => ({
       id: node.id,
       type: node.data.schema.type,
-      config: node.data.configValues
+      config: Object.fromEntries(
+        node.data.schema.config.map((field) => [
+          field.name,
+          normalizeConfigValue(field, node.data.configValues[field.name])
+        ])
+      )
     })),
     edges: edges
       .filter((edge) => edge.sourceHandle && edge.targetHandle)
@@ -367,15 +383,15 @@ export function AppShell({ layout, scene }: Props) {
                 </Button>
               </div>
               {catalog.map((node) => (
-                <button
+                <Button
                   key={node.type}
                   className="tree-item tree-button"
                   onClick={() => deployNode(node)}
-                  type="button"
+                  type="text"
                 >
                   {node.display_name}
                   <small>{node.category}</small>
-                </button>
+                </Button>
               ))}
               {catalog.length === 0 ? <div className="empty-state">未拉到后端节点</div> : null}
               {catalogError ? <div className="log-line err">{catalogError}</div> : null}
@@ -525,6 +541,11 @@ export function AppShell({ layout, scene }: Props) {
                     />
                   ) : (
                     <Input
+                      inputMode={
+                        field.value_type.startsWith('int') || field.value_type.startsWith('float')
+                          ? 'decimal'
+                          : 'text'
+                      }
                       value={String(selectedCanvasNode.data.configValues[field.name] ?? '')}
                       onChange={(event) =>
                         updateNodeField(selectedCanvasNode.id, field.name, event.target.value)

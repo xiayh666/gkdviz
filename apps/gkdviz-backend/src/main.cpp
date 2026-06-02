@@ -8,6 +8,7 @@
 #include "../../../core/algorithm/demo_pid.hpp"
 #include "../../../core/command/command_channel.hpp"
 #include "../../../core/graph/graph_compiler.hpp"
+#include "../../../core/integration/control_lib_adapter.hpp"
 #include "../../../core/reflection/node_schema_generator.hpp"
 #include "../../../core/reflection/static_reflection_provider.hpp"
 #include "../../../core/safety/safety_manager.hpp"
@@ -24,6 +25,8 @@ gkdviz::core::GraphCompiler::Catalog build_catalog() {
   gkdviz::core::GraphCompiler::Catalog catalog;
   auto pid_schema = generator.generate<gkdviz::core::DemoPid>();
   catalog.emplace(pid_schema.type, std::move(pid_schema));
+  auto control_lib_pid_schema = gkdviz::core::make_control_lib_pid_schema();
+  catalog.emplace(control_lib_pid_schema.type, std::move(control_lib_pid_schema));
   catalog.emplace(
       "VelocitySource",
       gkdviz::core::NodeSchema{
